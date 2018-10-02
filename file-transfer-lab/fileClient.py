@@ -10,7 +10,10 @@ from framedSock import framedSend, framedReceive
 
 
 switchesVarDefaults = (
+    # Uncomment line below and comment line after to work without proxy
     (('-s', '--server'), 'server', "127.0.0.1:50001"),
+    # Uncomment line below and comment line above to work with stammer proxy
+    # (('-s', '--server'), 'server', "127.0.0.1:50000"),
     (('-d', '--debug'), "debug", False), # boolean (set if present)
     (('-?', '--usage'), "usage", False), # boolean (set if present)
     )
