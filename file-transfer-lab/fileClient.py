@@ -108,8 +108,13 @@ while usrInput is not 'q':
             print("Wrong file or file path")
             continue
         #print("sending file %s" % (usrFileName))
-        #print("received:", framedReceive(s, debug))
+        recMessage = framedReceive(s, debug)
+        print("received:", recMessage.decode())
 
     # Else for enclosing userInput if statement
+    elif usrInput.strip() == 'q':
+        print("Exiting")
+        sys.exit(0)
+
     else:
         print("Invalid please try again, enter 'q' to exit")
