@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # Echo client program
-import socket, sys, re, os
+import socket, sys, re
 
 sys.path.append("../lib")       # for params
 import params
@@ -56,39 +56,57 @@ if s is None:
     print('could not open socket')
     sys.exit(1)
 
+# Staring client, asking until user wants to quit
 usrInput = ''
 while usrInput is not 'q':
+    # Asking user for input file and put command
     usrInput = input("Entering 'put' and a filename will allow you to transfer a file\n:")
+    # Splitting input by space to check if put command and filename is present
     splitInput = usrInput.split(' ')
     if splitInput[0].strip() == 'put':
         usrFileName = splitInput[-1]
+        # Try to open file, if not, print that file not found and loop again for input
         try:
-            fileN = open(usrFileName, 'rb')
-            info = os.stat(usrFileName)
-            fileSize = info.st_size
-            iter = (fileSize/100)
+            fileToSend = open(usrFileName, 'rb')
+
+            # Starting message, to pass in file name and start message (header)
             framedSend(s, b'start ' + usrFileName.encode(), debug)
-            count = 0
 
+            # Opening the file as a binary, to be able to send 100 bytes at a time
             with open(usrFileName.strip(),'rb') as binary_file:
-                lineData = binary_file.read()
-            lineData = lineData.replace(b'\n',b'~`')
+                # Variable to grab bytes from the file for sending
+                byteData = binary_file.read()
 
-            while len(lineData) >= 100:
-                send = lineData[:100]
-                lineDate = lineData[100:]
+            # Replacing new lines with special characters to avoid errors and replace them back later
+            byteData = byteData.replace(b'\n',b'~`')
+
+            # Checking if the length of the byteData is 100 bytes or more, if so, send the data
+            while len(byteData) >= 100:
+                # Send variable for the beginning 100 bytes
+                send = byteData[:100]
+                # Move the byteData from the last sent 100 bytes to the next 100 bytes, or end of the byteData
+                byteData = byteData[100:]
+                # Try to send the 100 bytes of byteData (send)
                 try:
                     framedSend(s, send, debug)
                 except BrokenPipeError:
                     print("Broken pipe, exiting")
                     sys.exit(1)
-            if len(lineData) > 0:
-                framedSend(s,lineDataata,debug)
-            framedSend(s,"~fInIs",debug)
+
+            # If byteData is still greater than 0, send the remaining bytes that were not apart of the last 100 bytes
+            if len(byteData) > 0:
+                framedSend(s,byteData,debug)
+
+            # Sending the end signal to know that the file is done sending
+            framedSend(s,b"~fInIs",debug)
+
+        # Match enclosing try
         except FileNotFoundError:
             print("Wrong file or file path")
             continue
         #print("sending file %s" % (usrFileName))
-        print("received:", framedReceive(s, debug))
+        #print("received:", framedReceive(s, debug))
+
+    # Else for enclosing userInput if statement
     else:
         print("Invalid please try again, enter 'q' to exit")
