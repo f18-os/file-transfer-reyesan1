@@ -13,7 +13,7 @@ switchesVarDefaults = (
     # Uncomment line below and comment line after to work without proxy
     (('-s', '--server'), 'server', "127.0.0.1:50001"),
     # Uncomment line below and comment line above to work with stammer proxy
-    # (('-s', '--server'), 'server', "127.0.0.1:50000"),
+    #(('-s', '--server'), 'server', "127.0.0.1:50000"),
     (('-d', '--debug'), "debug", False), # boolean (set if present)
     (('-?', '--usage'), "usage", False), # boolean (set if present)
     )
@@ -102,14 +102,16 @@ while usrInput is not 'q':
 
             # Sending the end signal to know that the file is done sending
             framedSend(s,b"~fInIs",debug)
+            recMessage = framedReceive(s, debug)
+            if recMessage:
+                print("received:", recMessage.decode())
+                sys.exit(0)
 
         # Match enclosing try
         except FileNotFoundError:
             print("Wrong file or file path")
             continue
         #print("sending file %s" % (usrFileName))
-        recMessage = framedReceive(s, debug)
-        print("received:", recMessage.decode())
 
     # Else for enclosing userInput if statement
     elif usrInput.strip() == 'q':
