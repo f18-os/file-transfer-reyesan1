@@ -102,6 +102,8 @@ while usrInput is not 'q':
 
             # Sending the end signal to know that the file is done sending
             framedSend(s,b"~fInIs",debug)
+
+            # Receiving the file received success message
             recMessage = framedReceive(s, debug)
             if recMessage:
                 print("received:", recMessage.decode())
